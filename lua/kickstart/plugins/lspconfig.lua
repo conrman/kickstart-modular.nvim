@@ -162,19 +162,152 @@ return {
       --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      local util = require 'lspconfig.util'
+
       local servers = {
-        -- clangd = {},
-        -- gopls = {},
-        -- pyright = {},
-        -- rust_analyzer = {},
-        -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-        --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- But for many setups, the LSP (`tsserver`) will work just fine
-        -- tsserver = {},
-        --
+        html = {
+          init_options = {
+            configurationSection = { 'html', 'css', 'javascript' },
+            embeddedLanguages = {
+              css = true,
+              javascript = true,
+            },
+            provideFormatter = true,
+          },
+        },
+
+        -- emmet_ls = {},
+        -- emmet_language_server = {},
+
+        phpactor = {
+          cmd = { 'phpactor', 'language-server' },
+          filetypes = { 'php' },
+          root_dir = function(pattern)
+            local cwd = vim.loop.cwd()
+            local root = util.root_pattern('composer.json', '.git', '.phpactor.json', '.phpactor.yml')(pattern)
+
+            -- prefer cwd if root is a descendant
+            return util.path.is_descendant(cwd, root) and cwd or root
+          end,
+        },
+
+        volar = {
+          -- Uncomment below to put Voloar in Take Over Mode
+          -- filetypes = {
+          --   'typescript',
+          --   'javascript',
+          --   'javascriptreact',
+          --   'typescriptreact',
+          --   'vue',
+          --   'json',
+          -- },
+          init_options = {
+            typescript = {
+              tsdk = '/opt/homebrew/lib/node_modules/typescript/lib',
+            },
+          },
+        },
+
+        tsserver = {
+          init_options = {
+            plugins = {
+              {
+                name = '@vue/typescript-plugin',
+                location = '/opt/homebrew/lib/node_modules/@vue/typescript-plugin',
+                languages = { 'javascript', 'typescript', 'vue' },
+              },
+            },
+          },
+          filetypes = {
+            'javascript',
+            'typescript',
+            'vue',
+          },
+        },
+
+        tailwindcss = {
+          cmd = { 'tailwindcss-language-server', '--stdio' },
+          filetypes = {
+            'aspnetcorerazor',
+            'astro',
+            'astro-markdown',
+            'blade',
+            'clojure',
+            'django-html',
+            'htmldjango',
+            'edge',
+            'eelixir',
+            'elixir',
+            'ejs',
+            'erb',
+            'eruby',
+            'gohtml',
+            'gohtmltmpl',
+            'haml',
+            'handlebars',
+            'hbs',
+            'html',
+            'htmlangular',
+            'html-eex',
+            'heex',
+            'jade',
+            'leaf',
+            'liquid',
+            'markdown',
+            'mdx',
+            'mustache',
+            'njk',
+            'nunjucks',
+            'php',
+            'razor',
+            'slim',
+            'twig',
+            'css',
+            'less',
+            'postcss',
+            'sass',
+            'scss',
+            'stylus',
+            'sugarss',
+            'javascript',
+            'javascriptreact',
+            'reason',
+            'rescript',
+            'typescript',
+            'typescriptreact',
+            'vue',
+            'svelte',
+            'templ',
+          },
+          init_options = {
+            userLanguages = {
+              eelixir = 'html-eex',
+              eruby = 'erb',
+              templ = 'html',
+            },
+          },
+          settings = {
+            tailwindCSS = {
+              classAttributes = { 'class', 'className', 'class:list', 'classList', 'ngClass' },
+              includeLanguages = {
+                eelixir = 'html-eex',
+                eruby = 'erb',
+                htmlangular = 'html',
+                templ = 'html',
+              },
+              lint = {
+                cssConflict = 'warning',
+                invalidApply = 'error',
+                invalidConfigPath = 'error',
+                invalidScreen = 'error',
+                invalidTailwindDirective = 'error',
+                invalidVariant = 'error',
+                recommendedVariantOrder = 'warning',
+              },
+              validate = true,
+            },
+          },
+        },
 
         lua_ls = {
           -- cmd = {...},

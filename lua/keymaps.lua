@@ -1,48 +1,76 @@
--- [[ Basic Keymaps ]]
---  See `:help vim.keymap.set()`
+-- [[ Helpers ]]
+function map(mode, shortcut, command)
+  vim.api.nvim_set_keymap(mode, shortcut, command, { noremap = true, silent = true })
+end
 
--- Clear highlights on search when pressing <Esc> in normal mode
---  See `:help hlsearch`
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+function nmap(shortcut, command)
+  map('n', shortcut, command)
+end
 
--- Diagnostic keymaps
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+function imap(shortcut, command)
+  map('i', shortcut, command)
+end
 
--- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
--- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
--- is not what someone will guess without a bit more experience.
---
--- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
--- or just use <C-\><C-n> to exit terminal mode
-vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+function vmap(shortcut, command)
+  map('v', shortcut, command)
+end
 
--- TIP: Disable arrow keys in normal mode
--- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
--- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
--- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
--- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+function cmap(shortcut, command)
+  map('c', shortcut, command)
+end
 
--- Keybinds to make split navigation easier.
---  Use CTRL+<hjkl> to switch between windows
---
---  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+function tmap(shortcut, command)
+  map('t', shortcut, command)
+end
 
--- [[ Basic Autocommands ]]
---  See `:help lua-guide-autocommands`
+-- Lazy Ex Commands
+nmap(';', ':')
 
--- Highlight when yanking (copying) text
---  Try it with `yap` in normal mode
---  See `:help vim.highlight.on_yank()`
-vim.api.nvim_create_autocmd('TextYankPost', {
-  desc = 'Highlight when yanking (copying) text',
-  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
-  callback = function()
-    vim.highlight.on_yank()
-  end,
+-- Quit like a winner
+nmap('<leader>q', ':q<CR>')
+
+-- Easy buffer navigation
+nmap('<C-h>', '<C-w>h')
+nmap('<C-j>', '<C-w>j')
+nmap('<C-k>', '<C-w>k')
+nmap('<C-l>', '<C-w>l')
+
+-- Begining & End of line in Normal mode
+nmap('H', '^')
+nmap('L', 'g_')
+
+-- Reselect visual block after indent/outdent
+vmap('<', '<gv')
+vmap('>', '>gv')
+
+-- Easy window split; C-w v -> vv, C-w - s -> ss
+nmap('vv', '<C-w>v')
+nmap('ss', '<C-w>s')
+vim.o.splitbelow = true -- when splitting horizontally, move coursor to lower pane
+vim.o.splitright = true -- when splitting vertically, mnove coursor to right pane
+
+-- Terminal
+-- ESC to go to normal mode in terminal
+tmap('<C-s>', '<C-\\><C-n>')
+tmap('<Esc><Esc>', '<C-\\><C-n>')
+
+-- Switch back to last file
+nmap('<leader><leader>', '<C-^>') -- not working?
+
+-- Exit insert mode center stage (a.k.a LET ME OUT!)
+imap('fj', '<Esc>')
+imap('jf', '<Esc>')
+imap('jj', '<Esc>')
+
+-- Save on [enter]
+vim.api.nvim_create_autocmd('BufWritePost', {
+  pattern = '*',
+  command = 'w',
 })
+nmap('<Enter>', ':w<CR>') -- don't move
 
--- vim: ts=2 sts=2 sw=2 et
+-- Open terminal
+nmap('<C-`>', ':8sp term://zsh<CR>')
+
+-- Vim-vinegar-like parent directory navigation
+-- nmap('-', ':Oil<CR>')
